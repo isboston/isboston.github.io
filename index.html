@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fb">
+  <meta name="description" content="Vladimir’s engineering work on Kubernetes recovery, Docker release testing and deployment of MCP services for ONLYOFFICE.">
+  <title>Vladimir · DevOps &amp; AI infrastructure</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f8fb;
+      --ink: #18243a;
+      --copy: #465469;
+      --line: #cdd3e0;
+      --blue: #304bc0;
+      --mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+      font-family: Inter, "Segoe UI", sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); }
+    a { color: var(--blue); text-underline-offset: .22em; }
+    a:hover { text-decoration-thickness: .13em; }
+    :focus-visible { outline: 3px solid #bc6019; outline-offset: 4px; }
+    h1, h2, h3, p, figure { margin: 0; }
+    .wrap { width: min(74rem, calc(100% - 6rem)); margin-inline: auto; }
+    .skip { position: absolute; left: 1rem; top: -5rem; padding: .7rem; background: white; }
+    .skip:focus { top: .7rem; z-index: 2; }
+    .masthead {
+      min-height: 4.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .wordmark {
+      display: inline-flex;
+      align-items: center;
+      gap: .65rem;
+      font: 700 1.2rem var(--mono);
+      letter-spacing: -.065em;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .terminal {
+      width: 1.85rem;
+      height: 1.75rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .17rem;
+      border-radius: .36rem;
+      background: var(--blue);
+    }
+    .terminal::before {
+      content: "";
+      width: .48rem;
+      height: .48rem;
+      border: solid white;
+      border-width: 2px 2px 0 0;
+      transform: rotate(45deg);
+    }
+    .terminal::after {
+      content: "";
+      width: .44rem;
+      height: 2px;
+      margin-top: .6rem;
+      background: white;
+    }
+    nav { display: flex; gap: 1.45rem; align-items: center; }
+    nav a { color: var(--ink); font-size: .9375rem; font-weight: 600; text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+    .github-link { padding: .5rem .9rem; border: 1px solid #aab4c7; border-radius: .4rem; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.16fr 1fr;
+      gap: clamp(2rem, 5vw, 5rem);
+      align-items: center;
+      padding-block: clamp(3.2rem, 5.5vw, 5.4rem);
+    }
+    .byline, .category, .when { font: 500 .875rem/1.5 var(--mono); }
+    .byline { color: var(--blue); margin-bottom: 1.25rem; }
+    h1 {
+      font-size: clamp(2.65rem, 4.7vw, 4.5rem);
+      font-weight: 650;
+      line-height: 1.04;
+      letter-spacing: -.058em;
+      overflow-wrap: break-word;
+    }
+    h1 span { display: block; color: var(--blue); }
+    .intro { max-width: 46ch; margin-top: 1.3rem; color: var(--copy); font-size: 1.16rem; line-height: 1.55; }
+    .measurement {
+      padding: clamp(1.3rem, 2.7vw, 2.2rem);
+      background: #192849;
+      color: #f7f9ff;
+      border-radius: .75rem;
+      min-width: 0;
+    }
+    .figure-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .35rem 1rem; }
+    .figure-head h2 { font-size: 1.4rem; font-weight: 600; letter-spacing: -.03em; }
+    .when { color: #c5cfe3; white-space: nowrap; }
+    .plot { margin: 1.4rem 0 .4rem; }
+    .sample + .sample { margin-top: .85rem; }
+    .sample-label { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; font-size: .98rem; }
+    .sample-label strong { font: 600 .98rem var(--mono); font-variant-numeric: tabular-nums; }
+    .track { position: relative; margin-top: .45rem; height: .55rem; border-radius: 2px; background: #354566; }
+    .bar { display: block; height: 100%; width: calc(var(--seconds) * 12.5%); border-radius: 2px; background: #94c8ff; }
+    .sample + .sample .bar { background: #aadeb6; }
+    .scale { display: flex; justify-content: space-between; margin-top: .55rem; color: #bac6da; font: .8rem var(--mono); }
+    .figure-note { margin-top: 1rem; border-top: 1px solid #445371; padding-top: .85rem; color: #d2daeb; font-size: .92rem; line-height: 1.45; }
+    .figure-note a { display: inline-block; margin-top: .4rem; color: white; }
+    .cases { padding-bottom: 2.65rem; }
+    .cases > h2 {
+      padding-bottom: .95rem;
+      font-size: clamp(1.8rem, 3vw, 2.35rem);
+      line-height: 1.15;
+      letter-spacing: -.045em;
+    }
+    .case {
+      display: grid;
+      grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
+      gap: 1rem clamp(2rem, 5vw, 4.5rem);
+      padding-block: 1.65rem;
+      border-top: 1px solid var(--line);
+      scroll-margin-top: 1rem;
+    }
+    .category { color: var(--blue); }
+    h3 { max-width: 27ch; margin-top: .3rem; font-size: clamp(1.35rem, 2.15vw, 1.85rem); line-height: 1.2; letter-spacing: -.035em; font-weight: 650; }
+    .summary { color: var(--copy); font-size: 1.04rem; line-height: 1.58; max-width: 64ch; }
+    code { color: var(--ink); font: .93em var(--mono); background: #e8ecf4; padding: .05em .25em; border-radius: .18em; }
+    .references { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; margin-top: .72rem; }
+    .references a { font-size: .94rem; font-weight: 620; }
+    footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: .5rem 1rem;
+      border-top: 1px solid var(--line);
+      padding-block: 1.15rem 1.8rem;
+      font-size: .9rem;
+      color: var(--copy);
+    }
+    @media (max-width: 58rem) {
+      .wrap { width: min(46rem, calc(100% - 3rem)); }
+      .hero { grid-template-columns: 1fr; gap: 2rem; padding-block: 2.8rem; }
+      h1 { font-size: clamp(2.75rem, 7.3vw, 4rem); }
+      .intro { max-width: 55ch; }
+      .case { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 1rem 1.8rem; }
+    }
+    @media (max-width: 40rem) {
+      .wrap { width: calc(100% - 2.5rem); }
+      .masthead { min-height: 4.1rem; }
+      nav { gap: .85rem; }
+      nav a { font-size: .875rem; }
+      .github-link { padding: .4rem .65rem; }
+      .byline { margin-bottom: .8rem; }
+      .hero { padding-block: 2.35rem; gap: 1.6rem; }
+      .intro { margin-top: 1rem; font-size: 1.05rem; }
+      .case { grid-template-columns: 1fr; gap: .7rem; padding-block: 1.3rem; }
+    }
+    @media (max-width: 24rem) {
+      .wrap { width: calc(100% - 2rem); }
+      h1 { font-size: 2.45rem; }
+      .terminal { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="masthead wrap" id="top">
+    <a class="wordmark" href="#top" aria-label="isboston home"><span class="terminal" aria-hidden="true"></span>isboston</a>
+    <nav aria-label="Main navigation">
+      <a href="#cases">Case studies</a>
+      <a class="github-link" href="https://github.com/isboston">GitHub profile</a>
+    </nav>
+  </header>
+  <main class="wrap" id="main">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="byline">Vladimir · DevOps engineer</p>
+        <h1 id="page-title">Release engineering <span>&amp; AI infrastructure</span></h1>
+        <p class="intro">I test published Docker images for ONLYOFFICE, integrate MCP services, and use Kubernetes failure drills to verify rollbacks.</p>
+      </div>
+      <figure class="measurement" aria-labelledby="figure-title">
+        <div class="figure-head">
+          <h2 id="figure-title">Time to recover</h2>
+          <time class="when" datetime="2026-11-11">11 Nov 2026</time>
+        </div>
+        <div class="plot">
+          <div class="sample">
+            <div class="sample-label"><span>Readiness failure</span><strong>1.33 s</strong></div>
+            <div class="track" aria-hidden="true"><span class="bar" style="--seconds: 1.33"></span></div>
+          </div>
+          <div class="sample">
+            <div class="sample-label"><span>Application failure</span><strong>6.75 s</strong></div>
+            <div class="track" aria-hidden="true"><span class="bar" style="--seconds: 6.75"></span></div>
+          </div>
+          <div class="scale" aria-hidden="true"><span>0 s</span><span>4 s</span><span>8 s</span></div>
+        </div>
+        <figcaption class="figure-note">Time from starting a rollback to verifying a working request in one Kubernetes lab run.<br><a href="https://github.com/isboston/release-lab/blob/main/docs/evidence/42998944679/e2e.json">View the recorded measurements</a></figcaption>
+      </figure>
+    </section>
+
+    <section class="cases" id="cases" aria-labelledby="cases-title">
+      <h2 id="cases-title">Selected case studies</h2>
+      <article class="case" id="release-lab">
+        <div>
+          <p class="category">Personal lab · Kubernetes</p>
+          <h3>Recovering a broken release</h3>
+        </div>
+        <div>
+          <p class="summary">A release passed its readiness check while <code>/work</code> returned <code>503</code>. My drill catches the failed request, rolls back with Helm, then verifies the response version and digest through the Kubernetes Service.</p>
+          <div class="references">
+            <a href="https://github.com/isboston/release-lab/blob/main/docs/validation.md">Validation record</a>
+            <a href="https://github.com/isboston/release-lab/actions/runs/42999887537">Recovery CI run</a>
+          </div>
+        </div>
+      </article>
+      <article class="case" id="docker-ci">
+        <div>
+          <p class="category">ONLYOFFICE · Release testing</p>
+          <h3>Testing the published Docker image</h3>
+        </div>
+        <div>
+          <p class="summary">I configured 35 integration scenarios to run weekly against images pinned by digest. The suite converts a DOCX file to PDF, validates HTTPS certificates and checks that the service still works after a restart.</p>
+          <div class="references">
+            <a href="https://github.com/ONLYOFFICE/Docker-DocumentServer/commit/35bee8f23867fe3668d80a425a9d447474d2d435">Integration test commit</a>
+            <a href="https://github.com/ONLYOFFICE/Docker-DocumentServer/actions/runs/43796233259">Scheduled CI run</a>
+          </div>
+        </div>
+      </article>
+      <article class="case" id="mcp-delivery">
+        <div>
+          <p class="category">ONLYOFFICE · AI infrastructure</p>
+          <h3>Shipping the DocSpace MCP service</h3>
+        </div>
+        <div>
+          <p class="summary">I added the Model Context Protocol (MCP) service to the DocSpace Docker deployment and corrected how systemd starts it from the Linux packages.</p>
+          <div class="references">
+            <a href="https://github.com/ONLYOFFICE/DocSpace-buildtools/commit/7e42278fecd346409f1233bacf8b38c8a21ee9fc">Docker integration</a>
+            <a href="https://github.com/ONLYOFFICE/DocSpace-buildtools/commit/08eab3ff7157f969fa4af7e7b318cf642051ef20">Linux package fix</a>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+  <footer class="wrap">
+    <span>Vladimir · Riga, Latvia</span>
+    <a href="#top">Back to top</a>
+  </footer>
+</body>
+</html>
