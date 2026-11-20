@@ -131,6 +131,27 @@
     code { color: var(--ink); font: .93em var(--mono); background: #e8ecf4; padding: .05em .25em; border-radius: .18em; }
     .references { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; margin-top: .72rem; }
     .references a { font-size: .94rem; font-weight: 620; }
+    .featured-project {
+      align-items: center;
+      margin-bottom: clamp(2.25rem, 4vw, 3.5rem);
+      padding: clamp(1.25rem, 2.5vw, 2rem);
+      border: 1px solid var(--line);
+      border-radius: .75rem;
+      background: white;
+    }
+    .featured-project h2 { margin-top: .25rem; font-size: clamp(1.5rem, 2.65vw, 2rem); letter-spacing: -.04em; }
+    .featured-project .references { align-items: center; }
+    .demo-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+      padding: .55rem 1rem;
+      border-radius: .4rem;
+      background: var(--blue);
+      color: white;
+      text-decoration: none;
+    }
+    .demo-link:hover { background: #233993; }
     footer {
       display: flex;
       justify-content: space-between;
@@ -200,6 +221,20 @@
         </div>
         <figcaption class="figure-note">Time from starting a rollback to verifying a working request in one Kubernetes lab run.<br><a href="https://github.com/isboston/release-lab/blob/main/docs/evidence/42998944679/e2e.json">View the recorded measurements</a></figcaption>
       </figure>
+    </section>
+
+    <section class="case featured-project" id="compose-upgrade-diff" aria-labelledby="compose-project-title">
+      <div>
+        <p class="category">Open-source tool · Docker Compose</p>
+        <h2 id="compose-project-title">compose-upgrade-diff</h2>
+      </div>
+      <div>
+        <p class="summary">Compare your local Compose file with two upstream releases to spot conflicting changes before an upgrade. Explore the authentik and Immich examples or load your own YAML in the browser.</p>
+        <div class="references">
+          <a class="demo-link" href="https://isboston.github.io/compose-upgrade-diff/">Try the demo</a>
+          <a href="https://github.com/isboston/compose-upgrade-diff">View repository</a>
+        </div>
+      </div>
     </section>
 
     <section class="cases" id="cases" aria-labelledby="cases-title">
